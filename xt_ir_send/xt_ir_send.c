@@ -20,7 +20,8 @@ extern int xt_irsend_hw_open(xt_irsend_obj_t *p_ob);
 
 int xt_irsend_open(xt_irsend_obj_t *p_ob);
 int xt_irsend_close(xt_irsend_obj_t *p_ob);
-int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pb, uint16_t size, uint8_t xus, uint8_t khz);
+int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pd, uint16_t size, uint8_t xus, uint8_t khz);
+int xt_irsend_decode_send(xt_irsend_obj_t *p_ob, const uint8_t *pd, uint16_t size, const xt_irsend_decode_fn_t p_fn);
 void xt_irsend_wave(xt_irsend_obj_t *p_ob);
 
 /**
@@ -99,7 +100,15 @@ int xt_irsend_open(xt_irsend_obj_t *p_ob)
 	p_ob->p_dv_wave_fn = xt_irsend_wave;
 	if (p_ob->p_hw_open_fn == 0)
 	{
+		#if (XT_IRSEND_HW_DRIVERS_EN == 0)
+		XT_IRSEND_LOCKED(); //>>>>>>>>>>>>>>>
+		xt_p_irsend[p_ob->ir_num] = 0;
+		XT_IRSEND_UNLOCK(); //<<<<<<<<<<<<<<<
+		xt_irsend_printf("irsend:xt_irsend_open->p_hw_open_fn error!\r\n");
+		return -7;
+		#else
 		p_ob->p_hw_open_fn = xt_irsend_hw_open;
+		#endif
 	}
 	if ((i = (*(p_ob->p_hw_open_fn))(p_ob)) < 0)
 	{
@@ -174,13 +183,13 @@ int xt_irsend_close(xt_irsend_obj_t *p_ob)
 /**
   * @brief  发送-红外码
   * @param  *p_ob      红外发送服务对象
-  * @param  *pb        红外码数据串  （单位:xus微秒）      ┌──────────→（每个数据的[bit0]同时用作是否有载波标志,bit0=1:表示此个数据为有载波时间）
+  * @param  *pd        红外码数据串  （单位:xus微秒）      ┌──────────→（每个数据的[bit0]同时用作是否有载波标志,bit0=1:表示此个数据为有载波时间）
   * @param  size       红外码数据大小（单位:字节）（特别：bit15=1表示上层应用已为每个数据设置有无载波标志；否则数据默认为:有载波时间，无载波时间，有，无 …）
   * @param  xus        红外码数据单位（单位:xus微秒）（如：4表示单位为4us,推荐:1-4us）
   * @param  khz        红外载波频率  （单位:KHz,≥30KHz）
   * @return ＜0:表示出错, ≥0:表示正确
   */
-int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pb, uint16_t size, uint8_t xus, uint8_t khz)
+int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pd, uint16_t size, uint8_t xus, uint8_t khz)
 {
 	XT_IRSEND_VARIAB()
 	uint16_t i = (size & 0x8000) ? 1 : 0;
@@ -211,12 +220,12 @@ int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pb, uint16_t size, uin
 		xt_irsend_printf("irsend:xt_irsend_send->send_run_flag error!\r\n");
 		return -2;
 	}
-	else if ((pb == 0)
+	else if ((pd == 0)
 	||       (size > p_ob->send_buf_size))
 	{
 	XT_IRSEND_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_IRSEND_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_irsend_printf("irsend:xt_irsend_send->pb/size error!\r\n");
+		xt_irsend_printf("irsend:xt_irsend_send->pd/size error!\r\n");
 		return -3;
 	}
 	else if ((xus == 0)
@@ -231,7 +240,7 @@ int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pb, uint16_t size, uin
 	p_ob->send_run_ver += 1;
 	v = p_ob->send_run_ver;
 	XT_IRSEND_UNLOCK(); //<<<<<<<<<<<<<<<
-	memcpy((char *)(p_ob->p_send_buf), (char *)pb, size);
+	memcpy((char *)(p_ob->p_send_buf), (char *)pd, size);
 	size /= sizeof(p_ob->p_send_buf[0]);
 	if (i == 0)
 	{
@@ -291,12 +300,12 @@ int xt_irsend_send(xt_irsend_obj_t *p_ob, const uint16_t *pb, uint16_t size, uin
 /**
   * @brief  发送-红外码（即时解码方式）
   * @param  *p_ob      红外发送服务对象
-  * @param  *pb        红外码压缩码
+  * @param  *pd        红外码压缩码
   * @param  size       红外码压缩码大小（单位:字节）
   * @param  *p_fn      红外解码函数
   * @return ＜0:表示出错, ≥0:表示正确
   */
-int xt_irsend_decode_send(xt_irsend_obj_t *p_ob, const uint8_t *pb, uint16_t size, const xt_irsend_decode_fn_t p_fn)
+int xt_irsend_decode_send(xt_irsend_obj_t *p_ob, const uint8_t *pd, uint16_t size, const xt_irsend_decode_fn_t p_fn)
 {
 	XT_IRSEND_VARIAB()
 	uint16_t d, v;
@@ -326,12 +335,12 @@ int xt_irsend_decode_send(xt_irsend_obj_t *p_ob, const uint8_t *pb, uint16_t siz
 		xt_irsend_printf("irsend:xt_irsend_send->send_run_flag error!\r\n");
 		return -2;
 	}
-	else if ((pb == 0)
+	else if ((pd == 0)
 	||       (size > p_ob->send_buf_size))
 	{
 	XT_IRSEND_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_IRSEND_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_irsend_printf("irsend:xt_irsend_send->pb/size error!\r\n");
+		xt_irsend_printf("irsend:xt_irsend_send->pd/size error!\r\n");
 		return -3;
 	}
 	else if (p_fn == 0)
@@ -345,7 +354,7 @@ int xt_irsend_decode_send(xt_irsend_obj_t *p_ob, const uint8_t *pb, uint16_t siz
 	p_ob->send_run_ver += 1;
 	v = p_ob->send_run_ver;
 	XT_IRSEND_UNLOCK(); //<<<<<<<<<<<<<<<
-	memcpy((char *)(p_ob->p_send_buf), pb, size);
+	memcpy((char *)(p_ob->p_send_buf), pd, size);
 	p_ob->send_cnt = 0;
 	p_ob->p_decode_fn = p_fn;
 	d = (*(p_ob->p_decode_fn))(p_ob->decode_tmp, p_ob->p_send_buf, &(p_ob->send_cnt));

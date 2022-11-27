@@ -11,6 +11,7 @@
   */
 #define   XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_C__
 #include "xt_ir_send_pwm_dma_stm32f1xx_hal.h"
+#if (XT_IRSEND_HW_DRIVERS_EN != 0)
 #if (defined XT_APP_IRSEND_EN) && (XT_APP_IRSEND_EN == XT_DEF_ENABLED)
 #ifdef    XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_X__
 #undef    XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_H__
@@ -117,7 +118,6 @@ int xt_irsend_hw_open(xt_irsend_obj_t *p_ob)
 	Be aware that there is only one channel to perform all the requested DMAs. */
 	//__HAL_LINKDMA(&xt_irsend_htim_pwm, hdma[XT_IRSEND_TIM_DMA_ID_CC], xt_irsend_hdma);
 	//__HAL_LINKDMA(&xt_irsend_htim_pwm, hdma[TIM_DMA_ID_UPDATE], xt_irsend_hdma);
-	//}
 	
 	xt_irsend_pwm_khz = p_ob->ir_khz;
 	p_ob->ir_khz += 1; //强制+1,为下行函数可执行相关硬件初始化┐
@@ -371,7 +371,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 			(*(xt_p_irsend_pwm->p_dv_wave_fn))(xt_p_irsend_pwm);
 		}
 		else
-		{
+		{	//一次DMA发不完，则分多次发
 			if ((irsend_pwm_seg = xt_irsend_pwm_sum - xt_irsend_pwm_cnt) >= XT_IRSEND_RAM_SUM)
 			{
 				xt_irsend_pwm_cnt += XT_IRSEND_RAM_SUM;
@@ -392,3 +392,4 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 }
 
 #endif  //#if (XT_APP_IRSEND_EN == XT_DEF_ENABLED)
+#endif

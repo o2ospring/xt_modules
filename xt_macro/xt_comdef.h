@@ -46,12 +46,13 @@ typedef signed char       int8_t;            /* signed 8  bit value */
 // 1、IAR-ARM 编译器识别宏（由 IARSystems 公司推出，应用的 IDE 有：IAR-EWARM）
 #if   defined(__ICCARM__)
 
+#warning "a"
 #define XT_PRAGMA(x)                         _Pragma(#x)
 #define XT_SECTION(x)                        @ x                             //数据拼接　（对象名称后明声明）
 #define XT_AT(a)                             @ a                             //地址指定　（对象名称后明声明）
-#define XT_PACKED                            ???/*无法兼容*/                 //字节对齐　（对象名称后明声明，强烈建议改用 #pragma pack(push, 1) ... #pragma pack(pop) 的兼容性更好）
+#define XT_PACKED                            /*无法兼容*/                    //字节对齐　（对象名称后明声明，强烈建议改用 #pragma pack(push, 1) ... #pragma pack(pop) 的兼容性更好）
 #define XT_ALIGN(n)                          XT_PRAGMA(data_alignment=n)     //地址对齐　（对象整体最前声明，等效于伪指令 #pragma location=地址 ... 注意：由[static]修饰的变量，[_Pragma]必须放在[static]之前，否则[_Pragma]不生效）
-#define XT_UNUSED                            /*无法兼容,影响不大,忽略即可*/  //未用不警告（对象整体最前声明）
+#define XT_UNUSED                            /*无法兼容,但影响不大,忽略即可*///未用不警告（对象整体最前声明）
 #define XT_USED                              __root                          //未用不优化（对象整体最前声明）
 #define XT_WEAK                              __weak                          //弱化对象　（对象整体最前声明）
 #define XT_INLINE                            static inline                   //内联函数　（对象整体最前声明，c/h文件中直接编写函数(体)，不能外部声明）
@@ -59,6 +60,7 @@ typedef signed char       int8_t;            /* signed 8  bit value */
 // 2、ARM-CC 编译器识别宏（由 ARM 公司推出，应用的 IDE 有：Keil-MDK）(即将淘汰)
 #elif defined(__CC_ARM)
 
+#warning "b"
 #define XT_SECTION(x)                        __attribute__((__section__(x))) //数据拼接　（对象名称后明声明）
 #define XT_AT(a)                             __attribute__((__at__(a)))      //地址指定　（对象名称后明声明）
 #define XT_PACKED                            __attribute__((__packed__))     //字节对齐　（对象名称后明声明，强烈建议改用 #pragma pack(push, 1) ... #pragma pack(pop) 的兼容性更好）
@@ -72,6 +74,7 @@ typedef signed char       int8_t;            /* signed 8  bit value */
 #elif defined(__clang__) \
 ||   (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
 
+#warning "c"
 #define XT_SECTION(x)                        __attribute__((__section__(x))) //数据拼接　（对象名称后明声明）
 #define XT_AT(a)                             __attribute__((__at__(a)))      //地址指定　（对象名称后明声明）
 #define XT_PACKED                            __attribute__((__packed__))     //字节对齐　（对象名称后明声明，强烈建议改用 #pragma pack(push, 1) ... #pragma pack(pop) 的兼容性更好）

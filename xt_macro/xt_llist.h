@@ -68,9 +68,9 @@ typedef struct xt_llhead_
   */
 #define XT_LL_DEL(PN)       do                    \
 {                                                 \
-	((PN)->next)->prev = ((PN)->prev);            \
-	((PN)->prev)->next = ((PN)->next);            \
-	XT_LL_INIT(PN);                               \
+    ((PN)->next)->prev = ((PN)->prev);            \
+    ((PN)->prev)->next = ((PN)->next);            \
+    XT_LL_INIT(PN);                               \
 }   while(0)
 
 /**
