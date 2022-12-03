@@ -22,6 +22,10 @@
 #define XT_HARD_INIT_2_TAB_EXPORT(func,name)
 #endif
 
+#if (XT_IRSEND_SUM != 1)
+#error "本硬件驱动只支持一路红外码发送!"
+#endif
+
 DMA_HandleTypeDef xt_irsend_hdma;
 TIM_HandleTypeDef xt_irsend_htim_pwm;
 xt_irsend_obj_t *xt_p_irsend_pwm = 0;
@@ -30,9 +34,6 @@ uint32_t xt_irsend_pwm_sum; //需要发送方波总数
 uint16_t xt_irsend_pwm_val[XT_IRSEND_RAM_SUM + 1];
 uint16_t xt_irsend_pwm_100; //发送方波频率100%
 uint8_t  xt_irsend_pwm_khz; //发送方波频率大小
-#if (XT_IRSEND_SUM != 1)
-#error "本硬件驱动只支持一路红外码发送!"
-#endif
 
 void xt_irsend_hw_init(void);
 int xt_irsend_hw_open(xt_irsend_obj_t *p_ob);

@@ -431,7 +431,7 @@ int xt_irsend_state(xt_irsend_obj_t *p_ob)
 }
 
 /**
-  * @brief  发送-〖方波〗(发送红外码)
+  * @brief  发送-〖方波〗(发送红外码)(在硬件层中断里调用)
   * @param  *p_ob      红外发送服务对象（★注意:由硬件层调用前保证合法性!!!）
   * @return void
   */

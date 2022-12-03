@@ -7,10 +7,10 @@ share = false
 image = ""
 menu  = ""
 slug  = ""
-title = "技术模块案例"
+title = "红外发送服务模块"
 +++ -->
 
-### <span id="1">一、构架</span>
+### 一、构架
 
 <details close=""><summary>1、功能简介</summary>
 
@@ -73,7 +73,7 @@ title = "技术模块案例"
 
 </details>
 
-### <span id="2">二、移植</span>
+### 二、移植
 
 <details close=""><summary>1、添加源文件</summary>
 
@@ -198,7 +198,7 @@ int bsp_board_init(void)
 
 </details>
 
-### <span id="3">三、使用</span>
+### 三、使用
 
 <details close=""><summary>1、应用示例</summary>
 
@@ -210,7 +210,8 @@ int bsp_board_init(void)
 #include "xt_ir_send.h"
 
 xt_irsend_obj_t app_irsend_obj; //红外发送服务应用对象
-uint16_t app_irsend_buf[48];    //红外发送缓冲
+uint16_t app_irsend_buf[100];   //红外发送缓冲
+uint16_t app_irsend_flag = 0;   //状态
 
 /**
   * @brief  红外发送服务[打开]操作成功协同回调
@@ -219,8 +220,9 @@ uint16_t app_irsend_buf[48];    //红外发送缓冲
   */
 void app_irsend_open_cb(const xt_irsend_obj_t *p_ob)
 {
+	//注意：上层已处理任务互斥!!
 	//XT_IRSEND_TASK_LOCKED(); //>>>>>>>>>>>>>>
-	//...
+	app_irsend_flag = 1; //根据实际通知应用程序...
 	//XT_IRSEND_TASK_UNLOCK(); //<<<<<<<<<<<<<<
 }
 
@@ -231,8 +233,9 @@ void app_irsend_open_cb(const xt_irsend_obj_t *p_ob)
   */
 void app_irsend_close_cb(const xt_irsend_obj_t *p_ob)
 {
+	//注意：上层已处理任务互斥!!
 	//XT_IRSEND_TASK_LOCKED(); //>>>>>>>>>>>>>>
-	//...
+	app_irsend_flag = 0; //根据实际通知应用程序...
 	//XT_IRSEND_TASK_UNLOCK(); //<<<<<<<<<<<<<<
 }
 
