@@ -5,6 +5,7 @@
   * Change Logs:
   * Date           Author       Notes
   * 2022-12-03     o2ospring    原始版本
+  * 2022-12-15     o2ospring    增加示波器发来命令的处理支持
   */
 #ifndef XT_SCOM_VOFA_H__
 #define XT_SCOM_VOFA_H__
@@ -30,9 +31,11 @@ extern "C" {
 
 #define XT_SCOMVOFA_SCOM_NUM        0                                   //串口通讯服务通道编号
 #define XT_SCOMVOFA_BAUD_RATE       9600  /*根据[VOFA+]配置决定*/       //串口通讯波特率, 如:9600,115200
+#define XT_SCOMVOFA_P_HW_OPEN_FN    0                                   //本服务模块提供的硬件驱动程序（0:不提供）
 #define XT_SCOMVOFA_CH_SUM          4     /*目前[VOFA+]没有限制*/       //示波器通道总数
 #define XT_SCOMVOFA_BIG_ENDIAN_SW   0     /*针对大端处理器才开启*/      //开启大端处理器
-#define xt_scomvofa_printf(...)     rt_kprintf(__VA_ARGS__)             //异常信息打印（目前还没用到可变参数，可以稍作修改本行宏即可支持C89语法）
+#define XT_SCOMVOFA_CMD_MAX         100   /*只支持[rt-thread]系统*/     //示波器传来的字符控制命令的大小限制（0:不支持）
+#define xt_scomvofa_printf(...)     rt_kprintf("scomvofa:" __VA_ARGS__) //异常信息打印（目前还没用到可变参数，可以稍作修改本行宏即可支持C89语法）
 
 #if (defined XT_SCOM_VOFA_C__) && (XT_APP_SCOMVOFA_EN == XT_DEF_ENABLED)
 struct rt_mutex                     xt_scomvofa_mutex;                                    //全局-互斥锁声明
@@ -54,6 +57,7 @@ extern void xt_scomvofa_init(void);
 extern int xt_scomvofa_1ch_put(uint8_t ch_n, float chx);
 extern int xt_scomvofa_4ch_put(uint8_t ch_f, float ch1, float ch2, float ch3, float ch4);
 extern int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch);
+extern void xt_scomvofa_cmd_run(void);
 
 #ifdef __cplusplus
 	}

@@ -11,7 +11,7 @@
   */
 #define   XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_C__
 #include "xt_ir_send_pwm_dma_stm32f1xx_hal.h"
-#if (XT_IRSEND_HW_DRIVERS_EN != 0)
+#if (XT_IRSEND_HW_DRIVERS_EN == 1)
 #if (defined XT_APP_IRSEND_EN) && (XT_APP_IRSEND_EN == XT_DEF_ENABLED)
 #ifdef    XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_X__
 #undef    XT_IR_SEND_PWM_DMA_STM32F1XX_HAL_H__

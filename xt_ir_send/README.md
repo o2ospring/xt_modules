@@ -265,7 +265,7 @@ void app_irsend_open(void)
 	app_irsend_obj.p_irsend_open_fn     = app_irsend_open_cb;     //红外发送服务[打开]操作成功协同回调
 	app_irsend_obj.p_irsend_close_fn    = app_irsend_close_cb;    //红外发送服务[关闭]操作成功协同回调
 	app_irsend_obj.p_irsend_complete_fn = app_irsend_complete_cb; //红外发送刚刚[完成]通知回调
-	app_irsend_obj.p_hw_open_fn         = 0;                      //使用模块自带的硬件驱动程序
+	app_irsend_obj.p_hw_open_fn         = 0;                      //本应用模块不提供硬件驱动程序
 	if (xt_irsend_open(&app_irsend_obj) < 0)
 	{
 		rt_kprintf("xt_irsend_open return error!\r\n");

@@ -80,6 +80,8 @@ void xt_scomsds_open(void)
 	xt_scomsds_obj.p_rx_data1_fn    = xt_scomsds_rx_data1_cb;    //【应用层服务】：中断中接收到第一字节数据通知函数（内参传递:pob->p_rx_buf）
 	xt_scomsds_obj.p_rx_data_fn     = xt_scomsds_rx_data_cb;     //【应用层服务】：中断中接收到整一组数据的传递函数（内参传递:pob->p_rx_buf, size）
 	
+	xt_scomsds_obj.p_hw_open_fn     = XT_SCOMSDS_P_HW_OPEN_FN;   //【硬件层服务】：本服务模块提供的硬件驱动程序（0:不提供）
+	
 	if (xt_scom_open(&xt_scomsds_obj, XT_SCOM_TYPE_DATA_FRAME/*数据帧*/) < 0)
 	{
 		xt_scomsds_printf("xt_scom_open return error!\r\n");
@@ -154,8 +156,8 @@ void xt_scomsds_tx_complete_cb(const xt_scom_obj_t *p_scom)
 }
 
 /**
-  * @brief  向串口虚拟示波器发送曲线数据（一路通道）
-  * @param  ch_n       发送第几路通道编号 (低7位:0->第1通道…)(★bit7->0表示等待数据传完才退出,即以阻塞方式发送数据★)
+  * @brief  向串口虚拟示波器发送曲线数据（修改一路通道）
+  * @param  ch_n       修改第几路通道编号 (低7位:0->第1通道…)(★bit7->0表示以阻塞方式发送数据★)
   * @param  chx        通道数值
   * @return ≤0:表示出错, ＞0:表示正确
   */
@@ -173,21 +175,21 @@ int xt_scomsds_1ch_put(uint8_t ch_n, int16_t chx)
 	i = XT_SCOMSDS_CRC16(xt_scomsds_data, 8);
 	xt_scomsds_data[8] = (uint8_t)(i & 0xFF);
 	xt_scomsds_data[9] = (uint8_t)(i >> 8);
-    i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
+	i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
 	if ((i > 0) && ((ch_n & 0x80) == 0)) {
 	XT_SCOMSDS_TX_SEM_TAKE(); }
 	XT_SCOMSDS_MUTEX_UNLOCK();  //互斥解锁 <<<<<<<<<<<<
 	
-    if (i < 0)
-    {
-        xt_scomsds_printf("xt_scom_send return error!\r\n");
-    }
+	if (i < 0)
+	{
+		xt_scomsds_printf("xt_scom_send return error!\r\n");
+	}
 	return (i);
 }
 
 /**
-  * @brief  向串口虚拟示波器发送曲线数据（多路通道）
-  * @param  ch_f       发送哪几路通道标志 (低7位:bit0->第1通道…)(★bit7->0表示等待数据传完才退出,即以阻塞方式发送数据★)
+  * @brief  向串口虚拟示波器发送曲线数据（修改多路通道）
+  * @param  ch_f       修改哪几路通道标志 (低7位:bit0->第1通道…)(★bit7->0表示以阻塞方式发送数据★)
   * @param  ch1        第1路通道数值
   * @param  ch2        第2路通道数值
   * @param  ch3        第3路通道数值
@@ -213,15 +215,15 @@ int xt_scomsds_4ch_put(uint8_t ch_f, int16_t ch1, int16_t ch2, int16_t ch3, int1
 	i = XT_SCOMSDS_CRC16(xt_scomsds_data, 8);
 	xt_scomsds_data[8] = (uint8_t)(i & 0xFF);
 	xt_scomsds_data[9] = (uint8_t)(i >> 8);
-    i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
+	i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
 	if ((i > 0) && ((ch_f & 0x80) == 0)) {
 	XT_SCOMSDS_TX_SEM_TAKE(); }
 	XT_SCOMSDS_MUTEX_UNLOCK();  //互斥解锁 <<<<<<<<<<<<
 	
-    if (i < 0)
-    {
-        xt_scomsds_printf("xt_scom_send return error!\r\n");
-    }
+	if (i < 0)
+	{
+		xt_scomsds_printf("xt_scom_send return error!\r\n");
+	}
 	return (i);
 }
 

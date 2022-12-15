@@ -71,6 +71,18 @@ void xt_scom_hw_init(void)
 	
 	//串口（对串口引脚进行初始化。策略:工作时才初始化串口控制器）■■■■■■■■■■■■■■■■■■■■■
 	//__HAL_RCC_AFIO_CLK_ENABLE();
+	#if (XT_SCOM_SUM >= 1)
+	XT_SCOM1_UART_CLK_EN();
+	#endif
+	#if (XT_SCOM_SUM >= 2)
+	XT_SCOM2_UART_CLK_EN();
+	#endif
+	#if (XT_SCOM_SUM >= 3)
+	XT_SCOM3_UART_CLK_EN();
+	#endif
+	#if (XT_SCOM_SUM >= 4)
+	XT_SCOM4_UART_CLK_EN();
+	#endif
 	
 	#if (XT_SCOM_SUM >= 1)
 		#ifdef XT_SCOM1_UART_TX_CLK_EN

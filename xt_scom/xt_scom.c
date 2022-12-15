@@ -46,13 +46,13 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 	||  (scom_type >= XT_SCOM_TYPE_SUM))
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->scom_num/scom_type error!\r\n");
+		xt_scom_printf("xt_scom_open->scom_num/scom_type error!\r\n");
 		return -1;
 	}
 	if (xt_p_scom[p_ob->scom_num] != 0)
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->xt_p_scom error!\r\n");
+		xt_scom_printf("xt_scom_open->xt_p_scom error!\r\n");
 		return -2;
 	}
 	xt_p_scom[p_ob->scom_num] = (void *)1;
@@ -63,7 +63,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->baud_rate error!\r\n");
+		xt_scom_printf("xt_scom_open->baud_rate error!\r\n");
 		return -3;
 	}
 	if ((p_ob->stop_bits != 1)
@@ -72,7 +72,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->stop_bits error!\r\n");
+		xt_scom_printf("xt_scom_open->stop_bits error!\r\n");
 		return -4;
 	}
 	if ((p_ob->parity_bits > 2)
@@ -81,7 +81,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->parity_bits error!\r\n");
+		xt_scom_printf("xt_scom_open->parity_bits error!\r\n");
 		return -5;
 	}
 	if ((p_ob->data_bits != 8)
@@ -90,7 +90,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->data_bits error!\r\n");
+		xt_scom_printf("xt_scom_open->data_bits error!\r\n");
 		return -6;
 	}
 	if (((p_ob->len_offset == 0xFF) && (p_ob->len_arithm < 2))
@@ -100,7 +100,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->len_arithm/section_mode error!\r\n");
+		xt_scom_printf("xt_scom_open->len_arithm/section_mode error!\r\n");
 		return -7;
 	}
 	if ((p_ob->p_rx_buf == 0)
@@ -109,7 +109,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->p_rx_buf/p_tx_buf error!\r\n");
+		xt_scom_printf("xt_scom_open->p_rx_buf/p_tx_buf error!\r\n");
 		return -8;
 	}
 	if ((p_ob->rx_buf_size == 0)
@@ -118,7 +118,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->rx_buf_size/tx_buf_size error!\r\n");
+		xt_scom_printf("xt_scom_open->rx_buf_size/tx_buf_size error!\r\n");
 		return -9;
 	}
 	if (/*(p_ob->p_scom_open_fn == 0)
@@ -130,7 +130,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->app cb finction error!\r\n");
+		xt_scom_printf("xt_scom_open->app cb finction error!\r\n");
 		return -10;
 	}
 	if ((p_ob->tx_buf_size > 0xFF) && (scom_type == XT_SCOM_TYPE_DATA_FRAME))
@@ -160,7 +160,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->scom_type error!\r\n");
+		xt_scom_printf("xt_scom_open->scom_type error!\r\n");
 		return -11;
 		#if (XT_SCOM_TYPE_SUM > 2)
 		#error ""
@@ -184,7 +184,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->p_hw_open_fn error!\r\n");
+		xt_scom_printf("xt_scom_open->p_hw_open_fn error!\r\n");
 		return -12;
 		#else
 		p_ob->p_hw_open_fn = xt_scom_hw_open;
@@ -195,7 +195,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->p_hw_open_fn error!\r\n");
+		xt_scom_printf("xt_scom_open->p_hw_open_fn error!\r\n");
 		return i;
 	}
 	else if ((p_ob->p_hw_tx_putc_fn == 0)
@@ -206,7 +206,7 @@ int xt_scom_open(xt_scom_obj_t *p_ob, uint8_t scom_type)
 		XT_SCOM_LOCKED(); //>>>>>>>>>>>>>>>
 		xt_p_scom[p_ob->scom_num] = 0;
 		XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_open->p_hw_open_fn error!\r\n");
+		xt_scom_printf("xt_scom_open->p_hw_open_fn error!\r\n");
 		return -12;
 	}
 	else
@@ -243,7 +243,7 @@ int xt_scom_close(xt_scom_obj_t *p_ob)
 		i = (p_ob->scom_num >= XT_SCOM_SUM) ? 0 : (int)(xt_p_scom[p_ob->scom_num]);
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_SCOM_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_close->scom_num/xt_p_scom error!\r\n");
+		xt_scom_printf("xt_scom_close->scom_num/xt_p_scom error!\r\n");
 		return (i == 1) ? -1 : -2;
 	}
 	else
@@ -287,14 +287,14 @@ int xt_scom_send(xt_scom_obj_t *p_ob, const uint8_t *pb, uint16_t size, uint8_t 
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_SCOM_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_send->scom_num/xt_p_scom error!\r\n");
+		xt_scom_printf("xt_scom_send->scom_num/xt_p_scom error!\r\n");
 		return -1;
 	}
 	else if (p_ob->tx_run_flag != 0)
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_SCOM_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_send->tx_run_flag error!\r\n");
+		xt_scom_printf("xt_scom_send->tx_run_flag error!\r\n");
 		return -2;
 	}
 	else if ((pb == 0)
@@ -302,7 +302,7 @@ int xt_scom_send(xt_scom_obj_t *p_ob, const uint8_t *pb, uint16_t size, uint8_t 
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
 	XT_SCOM_TASK_UNLOCK(); //<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_send->pb/size error!\r\n");
+		xt_scom_printf("xt_scom_send->pb/size error!\r\n");
 		return -3;
 	}
 	p_ob->tx_run_flag = 1;
@@ -324,7 +324,7 @@ int xt_scom_send(xt_scom_obj_t *p_ob, const uint8_t *pb, uint16_t size, uint8_t 
 	||  (xt_p_scom[p_ob->scom_num] != p_ob))
 	{
 	XT_SCOM_UNLOCK(); //<<<<<<<<<<<<<<<
-		xt_scom_printf("scom:xt_scom_send->scom_num/xt_p_scom error!\r\n");
+		xt_scom_printf("xt_scom_send->scom_num/xt_p_scom error!\r\n");
 		return -1;
 	}
 	if (p_ob->p_hw_tx_putc_null_fn != 0)
