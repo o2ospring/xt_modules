@@ -48,7 +48,7 @@ int xt_scomvofa_rx_data1_cb(const xt_scom_obj_t *p_scom);
 int xt_scomvofa_rx_data_cb(const xt_scom_obj_t *p_scom, uint16_t size);
 int xt_scomvofa_1ch_put(uint8_t ch_n, float chx);
 int xt_scomvofa_4ch_put(uint8_t ch_f, float ch1, float ch2, float ch3, float ch4);
-int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch);
+int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch, uint8_t s_ch);
 void xt_scomvofa_cmd_run(void);
 
 /**
@@ -200,7 +200,6 @@ int xt_scomvofa_1ch_put(uint8_t ch_n, float chx)
 	int i;
 	
 	i = ch_n & 0x7F;
-	if (i >= 4) return 0;
 	if (i >= XT_SCOMVOFA_CH_SUM) return 0;
 	
 	XT_SCOMVOFA_MUTEX_LOCKED();  //互斥上锁 >>>>>>>>>>>>
@@ -282,22 +281,24 @@ int xt_scomvofa_4ch_put(uint8_t ch_f, float ch1, float ch2, float ch3, float ch4
   * @brief  向串口虚拟示波器发送曲线数据（修改多路连续通道）
   * @param  ch_s       修改多少路连续通道 (低7位:1->共1通道)(★bit7->0表示以阻塞方式发送数据★)
   * @param  *p_ch      多路连续通道数值
+  * @param  s_ch       修改的起始通道    (0->第1路通道)
   * @return ≤0:表示出错, ＞0:表示正确
   */
-int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch)
+int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch, uint8_t s_ch)
 {
 	int i;
 	uint8_t ch_sum = ch_s & 0x7F;
 	
 	if (ch_sum == 0) return 0;
-	if (ch_sum > XT_SCOMVOFA_CH_SUM) ch_sum = XT_SCOMVOFA_CH_SUM;
+	if (s_ch  >= XT_SCOMVOFA_CH_SUM) return -1;
+	if (ch_sum > XT_SCOMVOFA_CH_SUM - s_ch) ch_sum = XT_SCOMVOFA_CH_SUM - s_ch;
 	
 	XT_SCOMVOFA_MUTEX_LOCKED();  //互斥上锁 >>>>>>>>>>>>
 	XT_SCOMVOFA_TX_SEM_RESET();
 	#if (XT_SCOMVOFA_BIG_ENDIAN_SW == 0)
-	for (i=0; i<ch_sum; i++) { xt_scomvofa_data[i] = p_ch[i]; }; //小端 float 数据格式
+	for (i=0; i<ch_sum; i++) { xt_scomvofa_data[i + s_ch] = p_ch[i]; }; //小端 float 数据格式
 	#else
-	for (i=0; i<ch_sum; i++) { xt_scomvofa_data[i] = XT_SCOMVOFA_SWAP32(p_ch[i]); }
+	for (i=0; i<ch_sum; i++) { xt_scomvofa_data[i + s_ch] = XT_SCOMVOFA_SWAP32(p_ch[i]); }
 	#endif
 	i = xt_scom_send(&xt_scomvofa_obj, (uint8_t *)xt_scomvofa_data, sizeof(xt_scomvofa_data)/*字节*/, 0/*us*/);
 	if ((i > 0) && ((ch_s & 0x80) == 0)) {
@@ -312,7 +313,7 @@ int xt_scomvofa_xch_put(uint8_t ch_s, float *p_ch)
 }
 
 /**
-  * @brief  运行示波器发来的控制指令
+  * @brief  运行示波器发来的控制指令（定时循环调用即可）
   * @param  xt_scomvofa_cmd_buf[]
   * @return void
   */

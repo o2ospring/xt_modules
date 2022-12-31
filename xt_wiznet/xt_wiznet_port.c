@@ -333,6 +333,13 @@ uint8_t xt_wiz_waite_chk(xt_wizchip_t *pwt, uint8_t s, uint8_t ver, uint8_t max)
 	else if (((pwt->fixed == 1) && ((pwt->tick - XT_WIZ_OS_TICK_GET()) > XT_WIZ_OS_TICK_OVMAX))
 	||       ((pwt->fixed == 2) && ((pwt->tick == 0) || (--(pwt->tick) == 0))))
 	{
+		//ttest
+		ver = XT_WIZ_OS_TICK_GET() - pwt->tick;
+		if (ver > 1)
+		{
+			ver--;
+		}
+		
 		pwt->flag = 1; //因超时退出等待
 		return 1;
 	}
@@ -394,7 +401,7 @@ void xt_socket_ot_rst(uint8_t s)
 /**
   * @brief  设置socket工作超时时间
   * @param  s        : socket通道号（0~7）
-  * @param  ostick   : 系统节拍数(0:强制退出,0xFFFFFFFF:永久)
+  * @param  ostick   : 系统节拍数(0:强制退出!!!,0xFFFFFFFF:永久)
   * @param  flag     : bit0=1->禁止降优先级调度
   *                    bit4=1->等待改为循环次数(只针对:xt_socket_recv_chk())
   *                    bit7=1->DHCP专用socket,应用绝对不能使用

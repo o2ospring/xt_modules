@@ -1,26 +1,26 @@
 ﻿<!-- +++
 author = "XT"
 comments = false
-date  = "2022-12-03"
+date  = "2022-12-16"
 draft = false
 share = false
 image = ""
 menu  = ""
 slug  = ""
-title = "VOFA+ 串口虚拟数字示波器"
+title = "VOFA+ 网络虚拟数字示波器"
 +++ -->
 
 ### 一、构架
 
 <details close=""><summary>1、功能简介</summary>
 
-串口虚拟数字示波器模块为我们将数据通过串口传输到 PC 软件上，并以示波曲线方式显示出来，方便我们对数据的分析，提高调试效率。它提供三种操作接口：修改一路、多路、多路连续通道，并发送所有通道状态。虚拟数字示波器同时具备编写控件向设备发送控制命令！
+网络虚拟数字示波器模块为我们将数据通过网络传输到 PC 软件上，并以示波曲线方式显示出来，方便我们对数据的分析，提高调试效率。它提供三种操作接口：修改一路、多路、多路连续通道，并发送所有通道状态。虚拟数字示波器同时具备编写控件向设备发送控制命令！
 
 </details>
 
 <details close=""><summary>2、模块架构</summary>
 
-![模块架构](./img/20221203_1_01.png)
+![模块架构](./img/20221216_1_01.png)
 
 </details>
 
@@ -28,9 +28,9 @@ title = "VOFA+ 串口虚拟数字示波器"
 
 |  环境  |  要求  |
 | :----- | :----- |
-| 软件环境 | 实时操作系统 或 裸机环境 均可 |
-| 硬件环境 | STM8 或 STM32F103 及更高性能 MCU |
-| 依赖环境 | 依赖【xt_scom】串行通信服务模块 |
+| 软件环境 | 实时操作系统（偏向 RT-Thread） |
+| 硬件环境 | STM32F103 及更高性能 MCU |
+| 依赖环境 | 依赖【xt_wiznet】网络通信服务模块 |
 
 </details>
 
@@ -48,7 +48,7 @@ title = "VOFA+ 串口虚拟数字示波器"
 
 将模块源文件、文件包含路径添加到工程，示例：
 
-![添加源文件到工程](./img/20221203_2_01.png)
+![添加源文件到工程](./img/20221216_2_01.png)
 
 </details>
 
@@ -61,18 +61,20 @@ void rt_init_thread_entry(void *p_arg)
 {
 	.
 	.
-	#if (XT_APP_SCOMVOFA_EN == XT_DEF_ENABLED)
-	xt_scomvofa_init();
+	#if (XT_APP_WIZNETVOFA_EN == XT_DEF_ENABLED)
+	xt_wizvofa_init();
 	#endif
-	#if (XT_APP_SCOMVOFA_EN == XT_DEF_ENABLED)
-	xt_scomvofa_open();
+	.
+	.
+	#if (XT_APP_WIZNETVOFA_EN == XT_DEF_ENABLED)
+	xt_wizvofa_open();
 	#endif
 	.
 	.
 }
 ```
 
-补充说明：如果工程有自动初始架构，可以由宏`XT_MSG_INIT_2_TAB_EXPORT(func,name)`自动调用函数进行初始化！
+补充说明：如果工程有自动初始架构，可以由宏`XT_MSG_INIT_2_TAB_EXPORT(func,name)`和`XT_APP_INIT_2_TAB_EXPORT(func,name)`自动调用函数进行初始化！
 
 </details>
 
@@ -81,8 +83,8 @@ void rt_init_thread_entry(void *p_arg)
 在使用模块的应用程序中加入头文件包含，示例：  
 
 ```c
-#if (XT_APP_SCOMVOFA_EN == XT_DEF_ENABLED)
-#include "xt_scom_vofa.h"
+#if (XT_APP_WIZNETVOFA_EN == XT_DEF_ENABLED)
+#include "xt_wiznet_vofa.h"
 #endif
 ```
 
@@ -92,7 +94,7 @@ void rt_init_thread_entry(void *p_arg)
 
 根据实际的使用环境配置模块参数，示例：
 
-![配置模块参数](./img/20221203_2_05.png)  
+![配置模块参数](./img/20221216_2_05.png)  
 
 补充说明：由于标准模块是不允许用户修改的，所以在应用时请启用头文件映射，在映射头文件修改配置！
 
@@ -106,14 +108,15 @@ void rt_init_thread_entry(void *p_arg)
 #define XT_DEF_DISABLED                 0                               /* 禁用模块                     */
 #define XT_DEF_ENABLED                  1                               /* 使能模块                     */
 
-#define XT_APP_DEBUG                    20221203                        /* 开启演示                     */
-#define __XT_SCOM_VOFA_REMAP_H
-#ifndef XT_APP_SCOMVOFA_EN
-#define XT_APP_SCOMVOFA_EN              XT_DEF_ENABLED                  /* 串口虚拟数字示波器(VOFA+)    */
+#define XT_APP_DEBUG                    20221216                        /* 开启演示                     */
+#define __XT_WIZNET_VOFA_REMAP_H
+#ifndef XT_APP_WIZNETVOFA_EN
+#define XT_APP_WIZNETVOFA_EN            XT_DEF_ENABLED                  /* 网络虚拟数字示波器(VOFA+)    */
 #endif
-#define __XT_SCOM_REMAP_H
-#ifndef XT_APP_SCOM_EN
-#define XT_APP_SCOM_EN                  XT_DEF_ENABLED                  /* 串行通信服务模块             */
+#define __XT_WIZNET_REMAP_H
+#define __XT_WIZNET_PORT_REMAP_H
+#ifndef XT_APP_WIZNET_EN
+#define XT_APP_WIZNET_EN                XT_DEF_ENABLED                  /* 网络服务模块                 */
 #endif
 ```
 
@@ -121,7 +124,7 @@ void rt_init_thread_entry(void *p_arg)
 
 <details close=""><summary>6、依赖模块说明</summary>
 
-本模块依赖于串行通信服务模块【xt_scom】，关于模块移植请参考其说明文档！
+本模块依赖于网络通信服务模块【xt_wiznet】，关于模块移植请参考其说明文档！
 
 </details>
 
@@ -132,28 +135,19 @@ void rt_init_thread_entry(void *p_arg)
 本示范只是以最简单方式展示模块的基本使用，并非一个应用实例！
 
 ```c
-#include "xt_scom_vofa.h"
+#include "xt_wiznet_vofa.h"
 
 //直接在应用中调用函数发送，例如显示 CPU 占有率：
-xt_scomvofa_1ch_put(0x80, (float)(cpu10000_usage_get(1)) / 100);
+xt_wizvofa_1ch_put(0, (float)(cpu10000_usage_get(1)) / 100);
 
-//应用示例[1]：单独修改 CH1 并将所有通道数据以【阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_1ch_put(0, 100);
+//应用示例[1]：单独修改 CH1 并由服务线程将所有通道数据发送到虚拟示波器显示
+xt_wizvofa_1ch_put(0, 100);
 
-//应用示例[2]：单独修改 CH1 并将所有通道数据以【非阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_1ch_put(0x80, 100);
+//应用示例[3]：同时修改 CH1、CH3 并由服务线程将所有通道数据发送到虚拟示波器显示
+xt_wizvofa_4ch_put(0x01|0x04, 100, 0, -100, 0);
 
-//应用示例[3]：同时修改 CH1、CH3 并将所有通道数据以【阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_4ch_put(0x01|0x04, 100, 0, -100, 0);
-
-//应用示例[4]：同时修改 CH1、CH3 并将所有通道数据以【非阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_4ch_put(0x80|0x01|0x04, 100, 0, -100, 0);
-
-//应用示例[5]：连串修改 CH1、CH2 并将所有通道数据以【阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_xch_put(2, chx2);                 //float chx2[2] = {-100, 100};
-
-//应用示例[6]：连串修改 CH1、CH2 并将所有通道数据以【非阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_xch_put(0x80|2, chx2);            //float chx2[2] = {-100, 100};
+//应用示例[5]：连串修改 CH1、CH2 并由服务线程将所有通道数据发送到虚拟示波器显示
+xt_wizvofa_xch_put(2, chx2, 0);              //float chx2[2] = {-100, 100};
 
 ```
 

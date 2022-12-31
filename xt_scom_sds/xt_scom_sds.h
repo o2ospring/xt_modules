@@ -53,6 +53,7 @@ struct rt_semaphore                 xt_scomsds_sem;                             
 extern void xt_scomsds_init(void);
 extern int xt_scomsds_1ch_put(uint8_t ch_n, int16_t chx);
 extern int xt_scomsds_4ch_put(uint8_t ch_f, int16_t ch1, int16_t ch2, int16_t ch3, int16_t ch4);
+extern int xt_scomsds_xch_put(uint8_t ch_s, int16_t *p_ch, uint8_t s_ch);
 
 #ifdef __cplusplus
 	}

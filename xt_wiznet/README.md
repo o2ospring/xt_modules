@@ -7,7 +7,7 @@ share = false
 image = ""
 menu  = ""
 slug  = ""
-title = "网络服务模块（硬件网络栈）"
+title = "WIZnet 网络服务模块（硬件网络栈）"
 +++ -->
 
 ### 一、构架
@@ -228,20 +228,14 @@ void app_udp_thread_entry(void *p_arg)
         if (xt_socket_chk(UDP_SK_NUM, Sn_MR_UDP, 0) == 0) goto udp_build; 
         if (wkver != xt_net_get_rstver()) goto udp_socket;   //如果网络重启了,则...
         if (lkver != xt_net_get_lnkver()) goto udp_link;     //如果网线拔掉了,则...
-        xt_socket_ot_set(UDP_SK_NUM, 0xFFFFFFFF/*永久*/, 0); //修改本次socket超时操作为永远
-        len = xt_socket_recv_chk(UDP_SK_NUM);                //检测socket是否收到数据
+        xt_socket_ot_set(UDP_SK_NUM, 0xFFFFFFFF/*永久*/, 0); //修改本次socket超时操作为永远（可在另一线程使用 xt_socket_ot_set(UDP_SK_NUM,0,0) 强制超时退出）
+        len = xt_socket_recv_chk(UDP_SK_NUM);                //检测socket是否收到数据　　　（可在另一线程使用 xt_socket_ot_set(UDP_SK_NUM,0,0) 强制超时退出）
         len = len > UDP_SK_BUFSZ ? UDP_SK_BUFSZ : len;       //处理数据大小与缓冲大小关系
         len = recvfrom(UDP_SK_NUM, pbuf, len, ip, &port);    //socket接收数据（同时得到对端的IP及端口）
         xt_socket_ot_set(UDP_SK_NUM, 50, 0);                 //修改本次socket超时操作为50个系统节拍
         if (sendto(UDP_SK_NUM, pbuf, len, ip, port) != len)  //socket发送数据（把收到的数据返回给对端）
         {                                                    //UDP为无连接,socket发送可随时向目标发送
             rt_kprintf("socket 0: sendto return error!\r\n");
-        }
-        else
-        {
-            pbuf[0] = '\r'; //回车
-            pbuf[1] = '\n'; //换行
-            sendto(UDP_SK_NUM, pbuf, 2, ip, port);
         }
     }
 }
@@ -305,8 +299,8 @@ void app_tcp_thread_entry(void *p_arg)
         }
         for (cnt = 0; cnt < tlen; cnt += rlen)               //socket接收数据
         {
-            xt_socket_ot_set(TCP_SK_NUM, 100/*1秒*/, 0);     //修改本次socket超时操作为1秒
-            rlen = xt_socket_recv_chk(TCP_SK_NUM);           //检测socket是否收到数据
+            xt_socket_ot_set(TCP_SK_NUM, 100/*1秒*/, 0);     //修改本次socket超时操作为1秒（可在另一线程使用 xt_socket_ot_set(TCP_SK_NUM,0,0) 强制超时退出）
+            rlen = xt_socket_recv_chk(TCP_SK_NUM);           //检测socket是否收到数据　 　（可在另一线程使用 xt_socket_ot_set(TCP_SK_NUM,0,0) 强制超时退出）
             rlen = rlen > TCP_SK_BUFSZ ? TCP_SK_BUFSZ : rlen;//处理数据大小与缓冲大小关系
             rlen = recv(TCP_SK_NUM, pbuf, rlen);             //socket接收数据（要求服务端返回客户端发送数据）
             //break;

@@ -37,6 +37,7 @@ int xt_scomsds_rx_data1_cb(const xt_scom_obj_t *p_scom);
 int xt_scomsds_rx_data_cb(const xt_scom_obj_t *p_scom, uint16_t size);
 int xt_scomsds_1ch_put(uint8_t ch_n, int16_t chx);
 int xt_scomsds_4ch_put(uint8_t ch_f, int16_t ch1, int16_t ch2, int16_t ch3, int16_t ch4);
+int xt_scomsds_xch_put(uint8_t ch_s, int16_t *p_ch, uint8_t s_ch);
 uint16_t xt_scomsds_crc16(uint8_t *p_d, uint8_t size);
 
 /**
@@ -217,6 +218,44 @@ int xt_scomsds_4ch_put(uint8_t ch_f, int16_t ch1, int16_t ch2, int16_t ch3, int1
 	xt_scomsds_data[9] = (uint8_t)(i >> 8);
 	i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
 	if ((i > 0) && ((ch_f & 0x80) == 0)) {
+	XT_SCOMSDS_TX_SEM_TAKE(); }
+	XT_SCOMSDS_MUTEX_UNLOCK();  //互斥解锁 <<<<<<<<<<<<
+	
+	if (i < 0)
+	{
+		xt_scomsds_printf("xt_scom_send return error!\r\n");
+	}
+	return (i);
+}
+
+/**
+  * @brief  向串口虚拟示波器发送曲线数据（修改多路连续通道）
+  * @param  ch_s       修改多少路连续通道 (低7位:1->共1通道)(★bit7->0表示以阻塞方式发送数据★)
+  * @param  *p_ch      多路连续通道数值
+  * @param  s_ch       修改的起始通道    (0->第1路通道)
+  * @return ≤0:表示出错, ＞0:表示正确
+  */
+int xt_scomsds_xch_put(uint8_t ch_s, int16_t *p_ch, uint8_t s_ch)
+{
+	int i;
+	uint8_t ch_sum = ch_s & 0x7F;
+	
+	if (ch_sum == 0) return 0;
+	if (s_ch  >= 4) return -1;
+	if (ch_sum > 4 - s_ch) ch_sum = 4 - s_ch;
+	
+	XT_SCOMSDS_MUTEX_LOCKED();  //互斥上锁 >>>>>>>>>>>>
+	XT_SCOMSDS_TX_SEM_RESET();
+	for (s_ch*=2,i=0; i<ch_sum; i++,s_ch+=2)
+	{
+		xt_scomsds_data[s_ch+0] = (uint8_t)(p_ch[i] & 0xFF);
+		xt_scomsds_data[s_ch+1] = (uint8_t)(p_ch[i] >> 8);
+	}
+	i = XT_SCOMSDS_CRC16(xt_scomsds_data, 8);
+	xt_scomsds_data[8] = (uint8_t)(i & 0xFF);
+	xt_scomsds_data[9] = (uint8_t)(i >> 8);
+	i = xt_scom_send(&xt_scomsds_obj, xt_scomsds_data, sizeof(xt_scomsds_data)/*字节*/, 0/*us*/);
+	if ((i > 0) && ((ch_s & 0x80) == 0)) {
 	XT_SCOMSDS_TX_SEM_TAKE(); }
 	XT_SCOMSDS_MUTEX_UNLOCK();  //互斥解锁 <<<<<<<<<<<<
 	
