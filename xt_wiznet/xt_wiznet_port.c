@@ -333,13 +333,6 @@ uint8_t xt_wiz_waite_chk(xt_wizchip_t *pwt, uint8_t s, uint8_t ver, uint8_t max)
 	else if (((pwt->fixed == 1) && ((pwt->tick - XT_WIZ_OS_TICK_GET()) > XT_WIZ_OS_TICK_OVMAX))
 	||       ((pwt->fixed == 2) && ((pwt->tick == 0) || (--(pwt->tick) == 0))))
 	{
-		//ttest
-		ver = XT_WIZ_OS_TICK_GET() - pwt->tick;
-		if (ver > 1)
-		{
-			ver--;
-		}
-		
 		pwt->flag = 1; //因超时退出等待
 		return 1;
 	}
