@@ -150,10 +150,10 @@ xt_scomvofa_4ch_put(0x01|0x04, 100, 0, -100, 0);
 xt_scomvofa_4ch_put(0x80|0x01|0x04, 100, 0, -100, 0);
 
 //应用示例[5]：连串修改 CH1、CH2 并将所有通道数据以【阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_xch_put(2, chx2);                 //float chx2[2] = {-100, 100};
+xt_scomvofa_xch_put(2, chx2, 0);               //float chx2[2] = {-100, 100};
 
 //应用示例[6]：连串修改 CH1、CH2 并将所有通道数据以【非阻塞】方式发送到虚拟示波器显示
-xt_scomvofa_xch_put(0x80|2, chx2);            //float chx2[2] = {-100, 100};
+xt_scomvofa_xch_put(0x80|2, chx2, 0);          //float chx2[2] = {-100, 100};
 
 ```
 
