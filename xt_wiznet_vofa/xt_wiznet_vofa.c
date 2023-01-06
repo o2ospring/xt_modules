@@ -79,7 +79,6 @@ XT_MSG_INIT_2_TAB_EXPORT(xt_wizvofa_init, "xt_wizvofa_init()");
   * @param  void
   * @return void
   */
-#if (XT_WIZVOFA_POWERON_EN != 0)
 void xt_wizvofa_open(void)
 {
 	XT_WIZVOFA_OS_THREAD_T p = 0;
@@ -89,6 +88,7 @@ void xt_wizvofa_open(void)
 		xt_wizvofa_open_f = 1;
 	}
 }
+#if (XT_WIZVOFA_POWERON_EN != 0)
 XT_APP_INIT_2_TAB_EXPORT(xt_wizvofa_open, "xt_wizvofa_open()");
 #endif
 
@@ -107,7 +107,7 @@ void xt_wizvofa_cycl(XT_WIZVOFA_OS_TICK_T tk)
 		XT_WIZVOFA_LOCKED();  //>>>>>>>>>>>>
 		if (xt_wizvofa_open_f != 0)
 		{
-			xt_wizvofa_open_f = 2; ///
+			xt_wizvofa_open_f = 2; //ÔÝÍ£Ê¾²¨Æ÷Ë¢ÐÂÏÔÊ¾
 			if (xt_wizvofa_run_f == 1)
 			{
 				xt_wizvofa_run_f = 2;

@@ -67,7 +67,9 @@ void rt_init_thread_entry(void *p_arg)
 	.
 	.
 	#if (XT_APP_WIZNETVOFA_EN == XT_DEF_ENABLED)
+	#if (XT_WIZVOFA_POWERON_EN != 0)
 	xt_wizvofa_open();
+	#endif
 	#endif
 	.
 	.
